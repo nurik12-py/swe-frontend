@@ -2,8 +2,8 @@ export interface Task {
   _id: string;
   name: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   complated: boolean;
   members: string[];
 }

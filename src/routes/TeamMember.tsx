@@ -96,7 +96,8 @@ export default function TeamMember() {
 
     try {
       const res = await deleteUser(id);
-      console.log(res);
+
+      window.location.href = "/team-members";
     } catch (error) {
       console.log(error);
     }

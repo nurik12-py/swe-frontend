@@ -1,5 +1,5 @@
 import { PlusIcon } from "@heroicons/react/solid";
-import { FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, useEffect, useState } from "react";
 import ProjectCard from "../components/ProjectCard";
 import { Spinner } from "../components/Spinner";
 import UserCard from "../components/UserCard";
@@ -8,18 +8,31 @@ import { useDecodedToken } from "../services/auth";
 import { getUsers } from "../services/user";
 
 const Team: React.FC = () => {
-  const [users, setUsers] = useState<User[] | undefined>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [filtered, setFiltered] = useState<User[]>();
   const { admin } = useDecodedToken();
 
   useEffect(() => {
     const getUsersAsync = async () => {
       const res = await getUsers();
       const users = res.data as User[];
+      setFiltered(users);
       setUsers(users);
     };
 
     getUsersAsync();
   }, []);
+
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    const usersCopy = [...users];
+    const result = usersCopy.filter(
+      (user) =>
+        user.firstName.toLowerCase().startsWith(e.target.value.toLowerCase()) ||
+        user.lastName.toLowerCase().startsWith(e.target.value.toLowerCase())
+    );
+    console.log(result);
+    setFiltered(result);
+  };
 
   return (
     <div>
@@ -33,9 +46,10 @@ const Team: React.FC = () => {
       </div>
       <div className="mb-4 flex justify-center">
         <input
+          onChange={handleSearch}
           type="text"
-          name="price"
-          id="price"
+          name="name"
+          id="name"
           className="block w-3/4 rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm md:w-1/3"
           placeholder="Search..."
         />
@@ -49,10 +63,10 @@ const Team: React.FC = () => {
           />
         )}
 
-        {!users ? (
+        {!filtered ? (
           <Spinner />
         ) : (
-          users.map((user) => (
+          filtered.map((user) => (
             <UserCard
               key={user._id}
               id={user._id!}

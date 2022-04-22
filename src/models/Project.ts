@@ -5,8 +5,8 @@ export interface Project {
   _id: string;
   name: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   complated: boolean;
   members: User[];
   tasks: Task[];

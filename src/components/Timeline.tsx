@@ -1,15 +1,15 @@
 import { FC } from "react";
 import { Project } from "../models/Project";
 
-const dateToMillis = (date: Date) => {
+const dateToMillis = (date: string) => {
   return new Date(date).getTime();
 };
 
 const getWidth = (
-  start: Date,
-  end: Date,
-  mainStart: Date,
-  mainEnd: Date
+  start: string,
+  end: string,
+  mainStart: string,
+  mainEnd: string
 ): string => {
   return (
     ((dateToMillis(end) - dateToMillis(start)) * 100) /
@@ -18,15 +18,15 @@ const getWidth = (
   );
 };
 
-const getDate = (stringDate: Date): string => {
+const getDate = (stringDate: string): string => {
   const date = new Date(stringDate);
-  return `${date.getDay()}.${date.getMonth()}.${date.getFullYear()}`;
+  return `${date.toISOString().slice(0, 10)}`;
 };
 
 const getLeftPosition = (
-  start: Date,
-  mainStart: Date,
-  mainEnd: Date
+  start: string,
+  mainStart: string,
+  mainEnd: string
 ): string => {
   return (
     ((dateToMillis(start) - dateToMillis(mainStart)) * 100) /

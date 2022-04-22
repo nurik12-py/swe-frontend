@@ -8,7 +8,7 @@ interface ProjectCardProps {
   name: string;
   description: string;
   complated: boolean;
-  endDate: Date;
+  endDate: string;
 }
 
 const TaskCard: React.FC<ProjectCardProps> = ({
@@ -33,7 +33,7 @@ const TaskCard: React.FC<ProjectCardProps> = ({
   };
 
   const getDate = (date: Date): string => {
-    return `${date.getDay()}.${date.getMonth()}.${date.getFullYear()}`;
+    return `${date.toISOString().slice(0, 10)}`;
   };
 
   return (

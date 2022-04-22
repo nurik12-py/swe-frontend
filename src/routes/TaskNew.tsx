@@ -2,13 +2,14 @@ import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SelectMenu, { Person } from "../components/SelectMenu";
+import { Spinner } from "../components/Spinner";
 import { Project } from "../models/Project";
 import User from "../models/User";
 import { createProject, getProject } from "../services/projects";
 import { createTask } from "../services/tasks";
 import { getUsers } from "../services/user";
 
-interface ProjectData {
+interface ProjectTask {
   name: string;
   description: string;
   endDate: string;
@@ -20,7 +21,7 @@ interface ProjectData {
 export default function TaskNew() {
   const [people, setPeople] = useState<Person[]>([]);
   const { id } = useParams();
-  const [project, setProject] = useState<ProjectData>({
+  const [task, setTask] = useState<ProjectTask>({
     name: "",
     description: "",
     startDate: "",
@@ -28,6 +29,8 @@ export default function TaskNew() {
     projectId: id!,
     members: [],
   });
+
+  const [project, setProject] = useState<Project>();
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -35,6 +38,7 @@ export default function TaskNew() {
     const getUsersAsync = async () => {
       const res = await getProject(id!);
       const project = res.data as Project;
+      setProject(project);
       const people = project.members.map((user) => {
         return {
           id: user._id!,
@@ -54,10 +58,30 @@ export default function TaskNew() {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    setProject((project) => {
+    setTask((task) => {
       const name = e.target.name;
       const value = e.target.value;
-      return { ...project, [name]: value };
+      return { ...task, [name]: value };
+    });
+  };
+
+  const handleDateChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    setTask((task) => {
+      const name = e.target.name;
+      const value = e.target.value;
+      const date = new Date(value);
+      if (
+        project &&
+        date > new Date(project.startDate) &&
+        date < new Date(project.endDate)
+      ) {
+        return { ...task, [name]: value };
+      }
+      return { ...task, [name]: value };
     });
   };
 
@@ -70,18 +94,18 @@ export default function TaskNew() {
         return curr;
       })
     );
-    setProject((project) => {
-      project.members = people
+    setTask((task) => {
+      task.members = people
         .filter((person) => person.selected)
         .map((person) => person.id);
-      return { ...project };
+      return { ...task };
     });
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await createTask(project);
+      const res = await createTask(task);
       window.location.href = "/projects";
       setSaving(false);
     } catch (error) {
@@ -91,7 +115,9 @@ export default function TaskNew() {
     }
   };
 
-  return (
+  return !project ? (
+    <Spinner />
+  ) : (
     <>
       <div className="hidden sm:block" aria-hidden="true">
         <div className="py-5">
@@ -133,7 +159,7 @@ export default function TaskNew() {
                         type="text"
                         name="name"
                         id="name"
-                        value={project.name}
+                        value={task.name}
                         onChange={handleChange}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       />
@@ -149,7 +175,7 @@ export default function TaskNew() {
                       <textarea
                         name="description"
                         id="description"
-                        value={project.description}
+                        value={task.description}
                         onChange={handleChange}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       ></textarea>
@@ -166,8 +192,11 @@ export default function TaskNew() {
                         type="date"
                         name="startDate"
                         id="startDate"
-                        value={project.startDate}
-                        onChange={handleChange}
+                        min={new Date(project!.startDate).getTime()}
+                        max={new Date(project!.endDate).getTime()}
+                        value={task.startDate}
+                        onChange={handleDateChange}
+                        required={true}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       />
                     </div>
@@ -183,8 +212,10 @@ export default function TaskNew() {
                         type="date"
                         name="endDate"
                         id="endDate"
-                        value={project.endDate}
-                        onChange={handleChange}
+                        min={project!.startDate}
+                        max={project!.endDate}
+                        value={task.endDate}
+                        onChange={handleDateChange}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       />
                     </div>

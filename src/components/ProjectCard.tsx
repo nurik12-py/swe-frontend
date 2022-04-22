@@ -6,7 +6,7 @@ interface ProjectCardProps {
   id: string;
   name: string;
   description: string;
-  endDate: Date;
+  endDate: string;
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -16,7 +16,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   endDate,
 }) => {
   const getDate = (date: Date): string => {
-    return `${date.getDay()}.${date.getMonth()}.${date.getFullYear()}`;
+    console.log(date);
+    return `${date.toISOString().slice(0, 10)}`;
   };
 
   return (

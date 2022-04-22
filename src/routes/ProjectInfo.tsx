@@ -14,7 +14,7 @@ import { deleteProject, getProject } from "../services/projects";
 
 const ProjectInfo: FC = () => {
   const { id: projectId } = useParams();
-  const [project, setProject] = useState<Project | undefined>();
+  const [project, setProject] = useState<Project>();
 
   useEffect(() => {
     const getProjectAsync = async () => {
@@ -26,7 +26,7 @@ const ProjectInfo: FC = () => {
 
   const handleDelete = async () => {
     if (!window.confirm("Do you want to delete the project?")) return;
-
+    console.log(project!._id);
     const res = await deleteProject(project!._id);
     window.location.href = "/projects";
   };
@@ -76,7 +76,7 @@ const ProjectInfo: FC = () => {
             <ProjectCard
               name={task.name}
               description={task.description}
-              endDate={new Date()}
+              endDate={task.endDate}
               id="id/activities/activityId"
             />
           ))}

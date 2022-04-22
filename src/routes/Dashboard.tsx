@@ -26,7 +26,7 @@ const Dashboard: FC = () => {
             complated={task.complated}
             name={task.name}
             description={task.description}
-            endDate={new Date()}
+            endDate={task.endDate}
             id={task._id}
           />
         ))}
